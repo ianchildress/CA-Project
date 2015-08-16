@@ -6,6 +6,10 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
+const (
+	SOCKET = "unix:///var/run/docker.sock"
+)
+
 func main() {
 	/*
 		cmd := exec.Command("docker", "ps")

@@ -1,0 +1,37 @@
+Civis Analytics project log
+
+Saturday 
+2PM
+Kids are sleeping and I have come up with an idea for the project. I am now learning about Docker Remote API so that I can list, start, and stop docker images. 
+
+Step 1, create base environment.
+main.go
+ - Starts mysql container
+ - Starts api server
+  * api server creates database & populates it with container information.
+ - Starts web server
+  * web server queries mysql for container information
+  * web server has option to start and stop containers
+
+2:30
+I am able to start the mysql container using main.go. Next step is to create a Go app container that can connect to the mysql server. We want to use the -link feature. I will need to learn how to expose the Docker remote api to the container network. Github issue dated from 2013-2014 states its a feature coming in version 0.8. 
+
+3:30
+Kids woke up early from a nap, it's been a circus but I have found Alpine Linux for Docker. I have created the base Go app for the API and it's size is only 11MB with the binary already compiled. Next step is connecting to the mysql database container from the api container. https://github.com/gliderlabs/docker-alpine
+
+To create civis-mysql
+docker run --name civis-mysql -e MYSQL_ROOT_PASSWORD=civis -d mysql
+
+To remove, build and create web/api
+docker rm api1
+CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+docker build -t ca-api -f Dockerfile.scratch .
+docker run --name api1 --link civis-mysql:mysql -d ca-api
+
+5:30
+API container is running, connects to the mysql container, and pulls data out of the database. Tomorrow I will resume and build api routes.
+
+Sunday
+10:45 AM
+Resuming work. The plan is to connect the api server to the Docker host's Remote API, get a list of all containers and their states, and use that to populate the mysql database on startup. I think Redis would be a better fit than mysql, but continuing with mysql due to scope and time restraints. 
+

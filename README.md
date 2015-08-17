@@ -55,6 +55,9 @@ I'm making a pivot in the project. The previous setup didn't allow for sensible 
 #### 5:00 PM
 ca-master now has options to stop and start containers when it starts. I plan to add a config file that will be read at startup. Stopping for the day.
 
-## Monday 10:30 AM
+## Monday 
+#### 10:30 AM
 Work is resuming. First step is to get the config file working.
 
+#### 4:00 PM
+Very busy day, had limited time to work. App now reads a config file. Current configuration stops all currently runnings containers, then starts a mysql container, creates 3 web containers and starts them. Awesome!

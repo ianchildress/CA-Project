@@ -17,15 +17,21 @@
             {
                 "id": "web1",
                 "hostconfig": {
-                    "links": "civis-mysql"
+                    "Links": ["civis-mysql"]
                 }
             }
         ],
         "images": [
             {
-                "id": "ca-web",
-                "hostconfig": {
-                    "links": "civis-mysql"
+                "image": "ca-web",
+                "options": {
+                    "name": "",
+                    "config": {
+                        "Image": "ca-web"
+                    },
+                    "hostconfig": {
+                        "Links": ["civis-mysql"]
+                    }
                 }
             }
         ]

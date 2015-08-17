@@ -1,0 +1,33 @@
+{
+    "start": {
+        "images": [
+            "ca-web",
+            "ca-web",
+            "ca-web"
+        ],
+        "containers": [
+            "civis-mysql"
+        ],
+        "settings": {
+            "stop-containers": true
+        }
+    },
+    "configs": {
+        "containers": [
+            {
+                "id": "web1",
+                "hostconfig": {
+                    "links": "civis-mysql"
+                }
+            }
+        ],
+        "images": [
+            {
+                "id": "ca-web",
+                "hostconfig": {
+                    "links": "civis-mysql"
+                }
+            }
+        ]
+    }
+}

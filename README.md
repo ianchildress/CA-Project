@@ -1,8 +1,6 @@
 # CA-Project
 Base repository for the CA project. This project is a combination of Docker, Go, and Polymer to provide a web interface for starting, stopping, adding, and removing Docker containers.
 
-Civis Analytics project log
-
 ## Saturday 
 #### 2PM
 Kids are sleeping and I have come up with an idea for the project. I am now learning about Docker Remote API so that I can list, start, and stop docker images. 
@@ -54,6 +52,9 @@ Had to break for kids. I now have the endpoint `GET /containers` and `GET /image
 #### 4:00 PM
 I'm making a pivot in the project. The previous setup didn't allow for sensible scaling. New setup will have the ca-master app, which runs on the docker host, provide the management screen and api. The containers will be dumber and I'll create "busy work" for them to do to replicate load. The ca-webserver is now up and running and responds to GET /. I'll build a small Polymer app for it to reply with at the end. This is the least important aspect of the project.
 
+#### 5:00 PM
+ca-master now has options to stop and start containers when it starts. I plan to add a config file that will be read at startup. Stopping for the day.
 
-
+## Monday 10:30 AM
+Work is resuming. First step is to get the config file working.
 

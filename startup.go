@@ -1,93 +1,94 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/fsouza/go-dockerclient"
+	"io/ioutil"
 	"log"
-	"time"
-
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 )
 
-type server struct {
-	Type string
-	Ip   string
-	Port string
+type ConfigFile struct {
+	Start   StartConfig `json:"start"`
+	Configs HostTypes   `json:"configs"`
 }
 
-func startup() {
-	var db *sqlx.DB
-
-	// This is a sloppy way to check if a database exists and create if it doesn't.
-	//  Sloppy due to time restraints.
-	db, err := sqlx.Open("mysql", "root:civis@tcp(civis-mysql:3306)/docker")
-	err = db.Ping()
-	if err != nil {
-		initDB()
-	}
-
-	// This is a sloppy way to check if the tables were created properly, and create
-	// them if they are not. Sloppy due to time restraints.
-	_, err = db.Queryx("SELECT * FROM servers")
-	if err != nil {
-		initTables()
-	}
-
-	db.Close()
+type StartConfig struct {
+	Images     []string      `json:"images"`
+	Containers []string      `json:"containers"`
+	Settings   StartSettings `json:"settings"`
 }
 
-func initDB() {
-	var db *sqlx.DB
-	db, err := sqlx.Open("mysql", "root:civis@tcp(civis-mysql:3306)/")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("CREATE DATABASE docker")
-	if err != nil {
-		panic(err)
-	}
+type StartSettings struct {
+	StopContainers bool `json:"stop-containers"`
 }
 
-func initTables() {
-	var db *sqlx.DB
-	db, err := sqlx.Open("mysql", "root:civis@tcp(civis-mysql:3306)/docker")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer db.Close()
+type HostTypes struct {
+	Images     []HostConfigs
+	Containers []HostConfigs
+}
 
-	var schema = `
-		CREATE TABLE containers (
-		    container_id varchar(32),
-		    image varchar(32),
-		    command varchar(32),
-		    created timestamp,
-		    status varchar(32),
-		    ports varchar(32),
-		    names varchar(32));`
+type HostConfigs struct {
+	Id         string             `json:"id"`
+	Hostconfig *docker.HostConfig `json:"hostconfig"`
+}
 
-	db.MustExec(schema)
-
-	c := container{
-		Container_id: "dev1",
-		Image:        "mysql",
-		Command:      "/entrypoint.sh",
-		Created:      time.Now(),
-		Status:       "Up 13 minutes",
-		Ports:        "3306/tcp",
-		Names:        "civis-mysql",
-	}
-
-	// Insert test data
-	tx := db.MustBegin()
-	r, err := tx.NamedExec("INSERT INTO containers (container_id, image, command, created, status, ports, names) VALUES (:container_id, :image, :command, :created, :status, :ports, :names)", &c)
+func LoadConfigFile() (config ConfigFile) {
+	f, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		log.Panic(err)
-	} else {
-		log.Println(r)
 	}
-	tx.Commit()
+
+	err = json.Unmarshal(f, &config)
+	if err != nil {
+		log.Printf("Error loading config file. %v", err)
+	}
 
 	return
+}
+
+func Start(config ConfigFile) {
+	// Start up parameters
+	if config.Start.Settings.StopContainers {
+		StopContainers()
+	}
+	// Load containers
+	// We will iterate through the specified containers and look for a matching
+	// docker.HostConfig if it is specified in the config.
+
+	// Iterate over containers to start up
+	for i := range config.Start.Containers {
+		var hostConfig *docker.HostConfig
+		for j := range config.Configs.Containers {
+			// Iterate over specified HostConfigs and look for a match
+			if config.Configs.Containers[j].Id == config.Start.Containers[i] {
+				hostConfig = config.Configs.Containers[j].Hostconfig
+				break
+			}
+		}
+		// Start the container
+		err := startContainer(config.Start.Containers[i], hostConfig)
+		if err != nil {
+			log.Printf("Error starting container %v. Error: %v", config.Configs.Containers[i].Id, err)
+		} else {
+			log.Printf("Container %v started successfully.", config.Configs.Containers[i].Id)
+		}
+	}
+
+	for i := range config.Start.Images {
+		var hostConfig *docker.HostConfig
+		for j := range config.Configs.Images {
+			// Iterate over specified HostConfigs and look for a match
+			if config.Configs.Images[j].Id == config.Start.Images[i] {
+				hostConfig = config.Configs.Images[j].Hostconfig
+				break
+			}
+		}
+		// Start the container
+		err := startContainer(config.Start.Images[i], hostConfig)
+		if err != nil {
+			log.Printf("Error starting Image %v. Error: %v", config.Configs.Images[i].Id, err)
+		} else {
+			log.Printf("Image %v started successfully.", config.Configs.Images[i].Id)
+		}
+	}
 }

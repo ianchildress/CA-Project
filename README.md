@@ -17,4 +17,4 @@ The app has a web interface that allows the following:
 * View status of containers
 * Create container from image
 
-If you wish to see my developer log, you can find it in devlog.md
+If you wish to see my developer log, you can find it in https://github.com/ianchildress/ca-master/blob/master/devlog.md

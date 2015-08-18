@@ -1,13 +1,12 @@
 {
     "start": {
         "images": [
+            "mysql",
             "ca-web",
             "ca-web",
             "ca-web"
         ],
-        "containers": [
-            "civis-mysql"
-        ],
+        "containers": [],
         "settings": {
             "stop-containers": true
         }
@@ -17,7 +16,9 @@
             {
                 "id": "web1",
                 "hostconfig": {
-                    "Links": ["civis-mysql"]
+                    "Links": [
+                        "civis-mysql"
+                    ]
                 }
             }
         ],
@@ -30,7 +31,19 @@
                         "Image": "ca-web"
                     },
                     "hostconfig": {
-                        "Links": ["civis-mysql"]
+                        "Links": [
+                            "civis-mysql"
+                        ]
+                    }
+                }
+            },
+            {
+                "image": "mysql",
+                "options": {
+                    "name": "civis-mysql",
+                    "config": {
+                        "Image": "mysql",
+                        "Env":["MYSQL_ROOT_PASSWORD=civis"]
                     }
                 }
             }

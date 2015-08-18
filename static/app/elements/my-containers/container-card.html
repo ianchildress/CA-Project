@@ -1,0 +1,94 @@
+<dom-module id="container-card">
+    <style>
+    :host {
+        display: block;
+        padding-bottom: 16px;
+        opacity: 0.6;
+        transition: opacity 400ms ease-in-out;
+    }
+    
+    :host(:hover) {
+        opacity: 1;
+    }
+    
+    :host(:active) {
+        ...
+    }
+    </style>
+    <template>
+        <iron-ajax id="ajax" auto method="GET" url="{{computeInspectURL(container)}}" content-type="application/json" handle-as="json" on-response="inspectresponse"></iron-ajax>
+        <iron-ajax id="startcontainer" method="GET" url="{{computeStartURL(container)}}" content-type="application/json" handle-as="json" on-response="inspectresponse"></iron-ajax>
+        <iron-ajax id="stopcontainer" method="GET" url="{{computeStopURL(container)}}" content-type="application/json" handle-as="json" on-response="inspectresponse">
+        </iron-ajax>
+        <paper-material elevation="1">
+            <paper-item>
+                <paper-item-body two-line class="flex">
+                    <div><strong>{{container.Image}}</strong></div>
+                    <div secondary>
+                        <div class="horizontal layout flex">
+                            <div>
+                                <span>ID: </span><span>{{container.Id}}</span>
+                            </div>
+                            <div class="flex"></div>
+                            <div>
+                                <div>
+                                    Status: <span>{{container.Status}}</span>
+                                </div>
+                                <div>
+                                    <paper-button on-click="start">Start</paper-button>
+                                    <paper-button on-click="stop">Stop</paper-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </paper-item-body>
+            </paper-item>
+        </paper-material>
+        <paper-dialog id="dialog">
+            <h2>{{container.Image}}</h2>
+            <div>{{container.Id}}</div>
+            <paper-dialog-scrollable>
+                Running: <strong><span>{{inspect.State.Running}}</span></strong>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+    </template>
+</dom-module>
+<script>
+(function() {
+    Polymer({
+        is: 'container-card',
+        properties: {
+            container: {
+                type: Object,
+                notify: true
+            },
+            inspect: {
+                type: Object,
+                notify: true
+            }
+        },
+        inspectresponse: function() {
+            this.inspect = this.$.ajax.lastResponse;
+            console.log(this.inspect);
+        },
+        computeInspectURL: function(container) {
+            console.log(container)
+            return "http://localhost:8080/container/" + this.container.Id + "/inspect";
+        },
+        computeStartURL: function(container) {
+            console.log(container)
+            return "http://localhost:8080/container/" + this.container.Id + "/start";
+        },
+        computeStopURL: function(container) {
+            console.log(container)
+            return "http://localhost:8080/container/" + this.container.Id + "/stop";
+        },
+        start: function() {
+            this.$.startcontainer.generateRequest()
+        },
+        stop: function() {
+            this.$.stopcontainer.generateRequest()
+        }
+    });
+})();
+</script>

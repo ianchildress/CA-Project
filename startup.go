@@ -60,7 +60,8 @@ func LoadConfigFile() (config ConfigFile) {
 func Start(config ConfigFile) {
 	// Start up parameters
 	if config.Start.Settings.StopContainers {
-		StopContainers()
+		StopAllContainers()
+		DeleteAllContainers()
 	}
 	// Load containers
 	// We will iterate through the specified containers and look for a matching
@@ -94,24 +95,72 @@ func Start(config ConfigFile) {
 			// Iterate over specified HostConfigs and look for a match
 			if config.Configs.Images[j].Image == config.Start.Images[i] {
 				opts = config.Configs.Images[j].Options
-				opts.Name = config.Configs.Images[j].Image + strconv.FormatInt(time.Now().UnixNano(), 10)
+				if config.Configs.Images[j].Options.Name == "" {
+					opts.Name = config.Configs.Images[j].Image + strconv.FormatInt(time.Now().UnixNano(), 10)
+				}
+
 				hostConfig = config.Configs.Images[j].Options.HostConfig
+
 				break
 			}
 		}
 		// Create a container
-
 		container, err := createContainer(opts)
 		if err != nil {
 			log.Panic(err)
 		}
 
 		err = startContainer(container.ID, hostConfig)
-
 		if err != nil {
-			log.Printf("Error creating Image %v. Error: %v", config.Configs.Images[i].Image, err)
+			log.Printf("Error starting image %v. Error: %v", container.ID, err)
 		} else {
-			log.Printf("Image %v started successfully as %v.", container.Image, container.Name)
+			log.Printf("Image %v started successfully as %v.", container.ID, container.Name)
 		}
 	}
+}
+
+func StopAllContainers() {
+	containers, err := listContainers(docker.ListContainersOptions{All: false})
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if len(containers) == 0 {
+		return
+	}
+
+	// Iterate over the containers and stop them.
+	for i := range containers {
+		err = stopContainer(containers[i].ID)
+		if err != nil {
+			log.Panic(err)
+		}
+		log.Printf("%v stopped.", containers[i].Names)
+	}
+
+	return
+}
+
+func DeleteAllContainers() {
+	containers, err := listContainers(docker.ListContainersOptions{All: true})
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if len(containers) == 0 {
+		return
+	}
+
+	// Iterate over the containers and stop them.
+	for i := range containers {
+		var opts docker.RemoveContainerOptions
+		opts.ID = containers[i].ID
+		err = removeContainer(opts)
+		if err != nil {
+			log.Panic(err)
+		}
+		log.Printf("Container %v removed.", containers[i].Names)
+	}
+
+	return
 }

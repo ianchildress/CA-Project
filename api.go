@@ -21,6 +21,8 @@ func serve() {
 	router.GET("/images", apiGetImages)
 	router.GET("/container/:id/start", apiStartContainer)
 	router.GET("/container/:id/stop", apiStopContainer)
+	router.GET("/container/:id/inspect", apiInspectContainer)
+	router.ServeFiles("/static/*filepath", http.Dir("static/app"))
 
 	// POST
 
@@ -42,6 +44,22 @@ func apiStartContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 }
 
+func apiInspectContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id := ps.ByName("id")
+	container, err := inspectContainer(id)
+
+	if err != nil {
+		w.WriteHeader(400)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})
+		log.Printf("%v failed to inspect. Error: %v", id, err)
+
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(container)
+		log.Printf("%v inspected.", id)
+	}
+}
+
 func apiStopContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id := ps.ByName("id")
 	err := stopContainer(id)
@@ -59,7 +77,7 @@ func apiStopContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 func apiGetContainers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Connect to the DOCKER HOST via unix socket and get a list of our containers.
 	// We'll put them into our database.
-	containers, err := listContainers(docker.ListContainersOptions{All: false})
+	containers, err := listContainers(docker.ListContainersOptions{All: true})
 	if err != nil {
 		w.WriteHeader(400)
 		json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})

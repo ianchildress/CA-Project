@@ -60,4 +60,8 @@ ca-master now has options to stop and start containers when it starts. I plan to
 Work is resuming. First step is to get the config file working.
 
 #### 4:00 PM
-Very busy day, had limited time to work. App now reads a config file. Current configuration stops all currently runnings containers, then starts a mysql container, creates 3 web containers and starts them. Awesome!
+Very busy day, had limited time to work. App now reads a config file. Current configuration stops all currently runnings containers, then starts a mysql container, creates 3 web containers and starts them. Awesome! I inspect the web containers and they correctly have the database linked.
+
+Next step will be to delete existing containers at start up. Eventually we will create a clean shutdown feature which will clean up any containers it has created and we will remove this item. For now I want to leave the containers working when the app completes so that I can verify their state using docker ps. 
+
+Next feature will be to add consumers to add load to the web clients and have the master app monitor their performance.

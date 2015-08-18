@@ -1,0 +1,111 @@
+<dom-module id="my-transactions">
+  <style>
+    :host {
+      display: block;
+      padding: 8px;
+    }
+    :host(.item) {
+      padding-bottom: 8px;
+      padding-top: 8px;
+    };
+  </style>
+  <template>
+    <h2 class="paper-font-display2">Transactions</h2>
+    <iron-localstorage name="token" value="{{token}}"></iron-localstorage>
+    <iron-ajax 
+      id="ajax"
+      method="GET"
+      url="http://public-api.neural-medium-818.appspot.com/v1/transactions"
+      content-type="application/json"
+      handle-as="json"
+      on-response="hresponse">
+    </iron-ajax>
+
+
+    <!-- Transaction Type -->
+    <iron-localstorage name="transaction-types" value="{{transactionTypes}}"></iron-localstorage>
+    <iron-ajax 
+      auto
+      id="ajax2"
+      method="GET"
+      url="http://public-api.neural-medium-818.appspot.com/v1/options/transaction_types"
+      content-type="application/json"
+      handle-as="json"
+      on-response="ttresponse">
+    </iron-ajax>
+    <!-- end Transaction type -->
+
+
+    <template is="dom-repeat" items="{{transactionTypes}}">
+      <paper-checkbox value="{{item.code}}" checked><span>{{item.label}}</span></paper-checkbox>
+    </template>
+
+
+    <div id="myHero1">
+      <div><paper-button raised on-click="getTransactions">Get Transactions</paper-button></div>
+    </div>
+
+    <div id="myHero2">
+      <template is="dom-repeat" items="{{items}}">
+        <transaction-card item="{{item}}"></transaction-card>
+      </template>
+    </template>
+    </div>
+</dom-module>
+<script>
+  (function () {
+    Polymer({
+      is: 'my-transactions',
+      behaviors: [
+        Polymer.NeonAnimatableBehavior,
+        Polymer.NeonAnimationRunnerBehavior
+      ],
+      properties: {
+        items: {
+          type: Array,
+          notify: true,
+        },
+        token :{
+          type: String
+        },
+        response: {
+          type: String
+        },
+        transactionTypes: {
+          type: Array
+        },
+        animationConfig: {
+          type: Object,
+          value: function() {
+            return {
+              'entry': {
+                name: 'slide-down-animation',
+                node: this
+              }
+            }
+          },
+        },
+      },
+      ready: function() {
+        this.items = [];
+        this.transactionTypes = [];
+      },
+      getTransactions: function () {
+        this.$.ajax.headers = {
+          'Authorization':'Bearer '+this.token
+        };
+        this.$.ajax.generateRequest();
+      },
+      hresponse: function(request) {
+        this.items = this.$.ajax.lastResponse.list;
+      },
+      ttresponse: function(request) {
+        this.transactionTypes = this.$.ajax2.lastResponse.codes;
+      },
+      show: function() {
+        this.style.visibility = 'visible';
+        this.playAnimation('entry');
+      },
+    });
+  })();
+</script>

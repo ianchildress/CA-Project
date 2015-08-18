@@ -69,10 +69,8 @@
         },
         inspectresponse: function() {
             this.inspect = this.$.ajax.lastResponse;
-            console.log(this.inspect);
         },
         computeInspectURL: function(container) {
-            console.log(container)
             return "http://localhost:8080/container/" + this.container.Id + "/inspect";
         },
         computeStartURL: function(container) {
@@ -80,7 +78,6 @@
             return "http://localhost:8080/container/" + this.container.Id + "/start";
         },
         computeStopURL: function(container) {
-            console.log(container)
             return "http://localhost:8080/container/" + this.container.Id + "/stop";
         },
         start: function() {

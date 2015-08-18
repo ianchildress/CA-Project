@@ -62,6 +62,7 @@ func Start(config ConfigFile) {
 	if config.Start.Settings.StopContainers {
 		StopAllContainers()
 		DeleteAllContainers()
+		DeleteEmptyImages()
 	}
 	// Load containers
 	// We will iterate through the specified containers and look for a matching
@@ -160,6 +161,31 @@ func DeleteAllContainers() {
 			log.Panic(err)
 		}
 		log.Printf("Container %v removed.", containers[i].Names)
+	}
+
+	return
+}
+
+func DeleteEmptyImages() {
+	var options docker.ListImagesOptions
+	images, err := listImages(options)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if len(images) == 0 {
+		return
+	}
+
+	// Iterate over the containers and stop them.
+	for i := range images {
+
+		if images[i].RepoTags[0] == "<none>:<none>" {
+			log.Printf("This image is <none>:<none> named: %v", images[i].ID)
+		} else {
+			log.Printf("Image name: %v", images[i].RepoTags[0])
+		}
+
 	}
 
 	return

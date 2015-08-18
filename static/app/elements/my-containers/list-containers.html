@@ -26,6 +26,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <template>
     <div class="layout horizontal flex">
+    <div>
+        <strong>Containers</strong>
+    </div>
       <div class="flex"></div>
       <div>
         <paper-button raised on-tap="refresh">Refresh</paper-button>
@@ -49,12 +52,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
             hresponse: function(request) {
-                console.log(this.$.ajax.lastResponse);
                 this.containers = this.$.ajax.lastResponse;
             },
             refresh: function(){
               response = this.$.ajax.generateRequest()
-              console.log(response)
             }
         });
     })();

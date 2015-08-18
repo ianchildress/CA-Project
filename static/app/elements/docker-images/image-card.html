@@ -1,0 +1,67 @@
+<dom-module id="image-card">
+    <style>
+    :host {
+        display: block;
+        padding-bottom: 16px;
+        opacity: 0.6;
+        transition: opacity 400ms ease-in-out;
+    }
+    
+    :host(:hover) {
+        opacity: 1;
+    }
+    
+    :host(:active) {
+        ...
+    }
+    </style>
+    <template>
+        <iron-ajax id="createimage" method="GET" url="{{computeCreateURL(image)}}" content-type="application/json" handle-as="json" on-response="createResponse"></iron-ajax>
+        </iron-ajax>
+        <paper-material elevation="1">
+            <paper-item>
+                <paper-item-body two-line class="flex">
+                    <div><strong>{{image.Name}}</strong></div>
+                    <div secondary>
+                        <div class="horizontal layout flex">
+                            <div>
+                                <span>Name: </span><span>{{image.RepoTags.0}}</span>
+                            </div>
+                            <div class="flex"></div>
+                                <div>
+                                    <paper-button on-click="create">Create Container</paper-button>
+                                </div>
+                        </div>
+                    </div>
+                </paper-item-body>
+            </paper-item>
+        </paper-material>
+    </template>
+</dom-module>
+<script>
+(function() {
+    Polymer({
+        is: 'image-card',
+        properties: {
+            image: {
+                type: Object,
+                notify: true
+            },
+            inspect: {
+                type: Object,
+                notify: true
+            }
+        },
+        createResponse: function() {
+            console.log(this.$.ajax.lastResponse);
+        },
+        computeCreateURL: function(image) {
+            var image = image.RepoTags[0]
+            return "http://localhost:8080/image/" + image + "/create";
+        },
+        create: function() {
+            this.$.createimage.generateRequest()
+        },
+    });
+})();
+</script>

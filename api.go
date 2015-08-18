@@ -20,6 +20,7 @@ func serve() {
 	router.GET("/containers", apiGetContainers)
 	router.GET("/images", apiGetImages)
 	router.GET("/container/:id/start", apiStartContainer)
+	router.GET("/image/:name/create", apiCreateContainer)
 	router.GET("/container/:id/stop", apiStopContainer)
 	router.GET("/container/:id/inspect", apiInspectContainer)
 	router.ServeFiles("/static/*filepath", http.Dir("static/app"))
@@ -41,6 +42,30 @@ func apiStartContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	} else {
 		w.WriteHeader(200)
 		log.Printf("%v started.", id)
+	}
+}
+
+func apiCreateContainer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var opts docker.CreateContainerOptions
+
+	var config docker.Config
+	config.Image = ps.ByName("name")
+
+	var hostConfig docker.HostConfig
+	hostConfig.Links = []string{"civis-mysql"}
+
+	opts.HostConfig = &hostConfig
+	opts.Config = &config
+
+	_, err := createContainer(opts)
+	if err != nil {
+		w.WriteHeader(400)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})
+		log.Printf("%v failed to create image.", config.Image)
+
+	} else {
+		w.WriteHeader(200)
+		log.Printf("%v created image.", config.Image)
 	}
 }
 

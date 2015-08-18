@@ -1,0 +1,64 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<dom-module id="list-images">
+    <style>
+    :host {
+        display: block;
+    }
+    
+    @media (max-width: 600px) {
+        h1.paper-font-display1 {
+            font-size: 24px;
+        }
+    }
+
+    paper-button {
+      background-color: #1976D2;
+      color: white;
+    }
+    </style>
+    <template>
+    <div class="layout horizontal flex">
+    <div>
+        <strong>Images</strong>
+    </div>
+      <div class="flex"></div>
+      <div>
+        <paper-button raised on-tap="refresh">Refresh</paper-button>
+      </div>
+    </div>
+        <iron-ajax id="ajax" auto method="GET" url="http://localhost:8080/images" content-type="application/json" handle-as="json" on-response="hresponse">
+        </iron-ajax>
+        <template is="dom-repeat" items="{{images}}">
+            <image-card image="{{item}}"></image-card>
+        </template>
+    </template>
+    <script>
+    (function() {
+        Polymer({
+            is: 'list-images',
+
+            properties: {
+                images: {
+                    type: Array,
+                    notify: true
+                }
+            },
+            hresponse: function(request) {
+                this.images = this.$.ajax.lastResponse;
+                console.log(this.images)
+            },
+            refresh: function(){
+              response = this.$.ajax.generateRequest()
+            }
+        });
+    })();
+    </script>
+</dom-module>

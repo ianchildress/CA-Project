@@ -72,9 +72,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-menu class="list" attr-for-selected="data-route" selected="{{route}}" on-iron-select="onMenuSelect">
           <a data-route="home" href="/">
             <iron-icon icon="home"></iron-icon>
-            <span>Containers</span>
+            <span>Docker</span>
           </a>
-
         </paper-menu>
       </paper-scroll-header-panel>
 
@@ -85,10 +84,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-toolbar id="mainToolbar" class="tall">
           <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
           <span class="flex"></span>
-
-          <!-- Toolbar icons -->
-          <paper-icon-button icon="refresh"></paper-icon-button>
-          <paper-icon-button icon="search"></paper-icon-button>
 
           <!-- Application name -->
           <div class="middle middle-container center horizontal layout">
@@ -108,6 +103,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <section data-route="home">
               <paper-material elevation="1">
                 <list-containers></list-containers>
+              </paper-material>
+              <paper-material elevation="1">
+                <list-images></list-images>
               </paper-material>
             </section>
           </iron-pages>

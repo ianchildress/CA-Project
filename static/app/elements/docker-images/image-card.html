@@ -24,13 +24,18 @@
                     <div><strong>{{image.Name}}</strong></div>
                     <div secondary>
                         <div class="horizontal layout flex">
+                        <div>
                             <div>
                                 <span>Name: </span><span>{{image.RepoTags.0}}</span>
                             </div>
+                            <div>
+                                <span>Image Size: </span><span>{{image.VirtualSize}}</span>
+                            </div>
+                        </div>
                             <div class="flex"></div>
-                                <div>
-                                    <paper-button on-click="create">Create Container</paper-button>
-                                </div>
+                            <div>
+                                <paper-button on-click="create">Create Container</paper-button>
+                            </div>
                         </div>
                     </div>
                 </paper-item-body>

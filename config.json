@@ -8,7 +8,10 @@
         ],
         "containers": [],
         "settings": {
-            "stop-containers": true
+            "stop-containers": false,
+            "delete-containers": false,
+            "autostart-containers": false,
+            "autocreate-images": false
         }
     },
     "configs": {

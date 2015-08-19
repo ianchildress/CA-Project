@@ -22,7 +22,10 @@ type StartConfig struct {
 }
 
 type StartSettings struct {
-	StopContainers bool `json:"stop-containers"`
+	StopContainers      bool `json:"stop-containers"`
+	DeleteContainers    bool `json:"delete-containers"`
+	AutoStartContainers bool `json:"autostart-containers"`
+	AutoCreateImages    bool `json:"autocreate-images"`
 }
 
 // ========= Configs section =====================
@@ -58,35 +61,24 @@ func LoadConfigFile() (config ConfigFile) {
 }
 
 func Start(config ConfigFile) {
+	settings := config.Start.Settings
 	// Start up parameters
-	if config.Start.Settings.StopContainers {
+	if settings.StopContainers {
 		StopAllContainers()
+	}
+	if settings.DeleteContainers {
 		DeleteAllContainers()
-		DeleteEmptyImages()
 	}
-	// Load containers
-	// We will iterate through the specified containers and look for a matching
-	// docker.HostConfig if it is specified in the config.
-
-	// Iterate over containers to start up
-	for i := range config.Start.Containers {
-		var hostConfig *docker.HostConfig
-		for j := range config.Configs.Containers {
-			// Iterate over specified HostConfigs and look for a match
-			if config.Configs.Containers[j].Id == config.Start.Containers[i] {
-				hostConfig = config.Configs.Containers[j].Hostconfig
-				break
-			}
-		}
-		// Start the container
-		err := startContainer(config.Start.Containers[i], hostConfig)
-		if err != nil {
-			log.Printf("Error starting container %v. Error: %v", config.Configs.Containers[i].Id, err)
-		} else {
-			log.Printf("Container %v started successfully.", config.Configs.Containers[i].Id)
-		}
+	if settings.AutoStartContainers {
+		AutoStartContainers(config)
+	}
+	if settings.AutoCreateImages {
+		AutoCreateImages(config)
 	}
 
+}
+
+func AutoCreateImages(config ConfigFile) {
 	for i := range config.Start.Images {
 		var opts docker.CreateContainerOptions
 		var hostConfig *docker.HostConfig
@@ -116,6 +108,27 @@ func Start(config ConfigFile) {
 			log.Printf("Error starting image %v. Error: %v", container.ID, err)
 		} else {
 			log.Printf("Image %v started successfully as %v.", container.ID, container.Name)
+		}
+	}
+}
+
+func AutoStartContainers(config ConfigFile) {
+	// Iterate over containers to start up
+	for i := range config.Start.Containers {
+		var hostConfig *docker.HostConfig
+		for j := range config.Configs.Containers {
+			// Iterate over specified HostConfigs and look for a match
+			if config.Configs.Containers[j].Id == config.Start.Containers[i] {
+				hostConfig = config.Configs.Containers[j].Hostconfig
+				break
+			}
+		}
+		// Start the container
+		err := startContainer(config.Start.Containers[i], hostConfig)
+		if err != nil {
+			log.Printf("Error starting container %v. Error: %v", config.Configs.Containers[i].Id, err)
+		} else {
+			log.Printf("Container %v started successfully.", config.Configs.Containers[i].Id)
 		}
 	}
 }

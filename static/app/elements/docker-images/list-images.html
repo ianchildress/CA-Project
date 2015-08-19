@@ -18,22 +18,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             font-size: 24px;
         }
     }
-
+    
     paper-button {
-      background-color: #1976D2;
-      color: white;
+        background-color: #1976D2;
+        color: white;
     }
     </style>
     <template>
-    <div class="layout horizontal flex">
-    <div>
-        <strong>Images</strong>
-    </div>
-      <div class="flex"></div>
-      <div>
-        <paper-button raised on-tap="refresh">Refresh</paper-button>
-      </div>
-    </div>
+        <div class="layout horizontal flex">
+            <div>
+                <strong>Images</strong>
+            </div>
+            <div class="flex"></div>
+        </div>
         <iron-ajax id="ajax" auto method="GET" url="http://localhost:8080/images" content-type="application/json" handle-as="json" on-response="hresponse">
         </iron-ajax>
         <template is="dom-repeat" items="{{images}}">
@@ -55,8 +52,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.images = this.$.ajax.lastResponse;
                 console.log(this.images)
             },
-            refresh: function(){
-              response = this.$.ajax.generateRequest()
+            refresh: function() {
+                response = this.$.ajax.generateRequest()
             }
         });
     })();

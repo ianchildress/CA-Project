@@ -1,8 +1,8 @@
-# CA-Project
-Base repository for the CA project. This project is a combination of Docker, Go, and Polymer to provide a web interface for starting, stopping, adding, and removing Docker containers.
+# Polydocker
+Polymer based front end for Docker. Manage Docker containers and images using a web interface, served by Go.
 
 # Summary
-This project uses a combination of Go, Docker, Polymer, and Javascript to create a simple interface for interacting with Docker. 
+This project uses a combination of Go, Docker, Polymer, and Javascript to create a simple interface for interacting with Docker hosts. 
 
 ## Start up
 The app has a config.json file that allows the following:
@@ -17,4 +17,7 @@ The app has a web interface that allows the following:
 * View status of containers
 * Create container from image
 
-If you wish to see my developer log, you can find it in https://github.com/ianchildress/ca-master/blob/master/devlog.md
+## Coming features
+* Multiple host management
+* Search and pull images from Docker Hub
+* Inspect and details on containers
